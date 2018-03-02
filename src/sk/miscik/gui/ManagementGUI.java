@@ -1,5 +1,6 @@
 package sk.miscik.gui;
 
+import sk.miscik.main.ComponentBuilder;
 import sk.miscik.main.Main;
 import sk.miscik.main.User;
 
@@ -8,15 +9,15 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.ArrayList;
 
 public class ManagementGUI extends JFrame {
 
     public static final int WIDTH = 800, HEIGHT = 720;
 
     private User user;
-    private JPanel dashboardPanel;
-    private JPanel newPanel;
-    private JPanel myPanel;
+    private ArrayList<Component> dashboardComponents;
+    private ArrayList<Component> newComponents;
     private Point mouse;
 
     public ManagementGUI(User user) throws Exception {
@@ -35,6 +36,13 @@ public class ManagementGUI extends JFrame {
         this.setLayout(null);
         this.getContentPane().setLayout(null);
         this.user = user;
+
+        this.dashboardComponents = ComponentBuilder.getDashboardComponents(user);
+        this.newComponents = ComponentBuilder.getNewComponents(user);
+
+        for (Component c : dashboardComponents) {
+            this.add(c);
+        }
 
         JLabel topLabel = new JLabel("  "+this.getTitle());
         topLabel.setSize(WIDTH,40);
@@ -99,11 +107,74 @@ public class ManagementGUI extends JFrame {
         sidePanel.setSize(130,HEIGHT-40);
         sidePanel.setLocation(0,40);
         sidePanel.setBackground(new Color(48,48,67));
-        this.getContentPane().add(sidePanel);
 
-        this.dashboardPanel = new DashboardPanel(user);
-        this.getContentPane().add(dashboardPanel);
-        //this.setContentPane(dashboardPanel);
+        JButton dashboardButton = new JButton("Dashboard");
+        dashboardButton.setSize(130,40);
+        dashboardButton.setLocation(0, 0);
+        dashboardButton.setFocusPainted(false);
+        dashboardButton.setBorderPainted(false);
+        dashboardButton.setContentAreaFilled(false);
+        dashboardButton.setForeground(Color.WHITE);
+        dashboardButton.setMargin(new Insets(0,0,0,0));
+        dashboardButton.setBorder(null);
+        dashboardButton.setFont(font.deriveFont(24f));
+        dashboardButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                dashboardButton.setForeground(Color.CYAN);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                dashboardButton.setForeground(Color.WHITE);
+            }
+        });
+        dashboardButton.addActionListener(e ->{
+            for (Component c : newComponents) {
+                this.getContentPane().remove(c);
+            }
+            for (Component c : dashboardComponents) {
+                this.getContentPane().add(c);
+            }
+            this.getContentPane().revalidate();
+            this.getContentPane().repaint();
+        });
+        sidePanel.add(dashboardButton);
+
+        JButton newButton = new JButton("New");
+        newButton.setSize(130,40);
+        newButton.setLocation(0, 40);
+        newButton.setFocusPainted(false);
+        newButton.setBorderPainted(false);
+        newButton.setContentAreaFilled(false);
+        newButton.setForeground(Color.WHITE);
+        newButton.setMargin(new Insets(0,0,0,0));
+        newButton.setBorder(null);
+        newButton.setFont(font.deriveFont(24f));
+        newButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                newButton.setForeground(Color.CYAN);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                newButton.setForeground(Color.WHITE);
+            }
+        });
+        newButton.addActionListener(e ->{
+            for (Component c : dashboardComponents) {
+                this.getContentPane().remove(c);
+            }
+            for (Component c : newComponents) {
+                this.getContentPane().add(c);
+            }
+            this.getContentPane().revalidate();
+            this.getContentPane().repaint();
+        });
+        sidePanel.add(newButton);
+
+        this.getContentPane().add(sidePanel);
 
         this.pack();
         this.setLocationRelativeTo(null);

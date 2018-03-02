@@ -81,7 +81,7 @@ public class LoginGUI extends JFrame {
         loginButton.setFont(font.deriveFont(16f));
         loginButton.addActionListener(e ->{
             if (userField.getText().length() == 0 || passField.getPassword().length == 0) {
-                JOptionPane.showMessageDialog(null, "Please enter your credentials.", "Warning", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Please enter your credentials!", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             String userName = this.userField.getText();
