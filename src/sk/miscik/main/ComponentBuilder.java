@@ -1,5 +1,6 @@
 package sk.miscik.main;
 
+import sk.miscik.gui.CustomCBUI;
 import sk.miscik.gui.LoginGUI;
 
 import javax.swing.*;
@@ -73,7 +74,7 @@ public class ComponentBuilder {
         logoutButton.addActionListener(e -> {
             ((JFrame)(userPanel.getParent().getParent().getParent().getParent())).dispose();
             try {
-                HTMLRequest.getInstance().logout(user);
+                HTTPRequest.getInstance().logout(user);
                 new LoginGUI().setVisible(true);
             } catch (Exception ex) {ex.printStackTrace();}
         });
@@ -83,7 +84,7 @@ public class ComponentBuilder {
         return Cs;
     }
 
-    public static ArrayList<Component> getNewComponents(User user) {
+    public static ArrayList<Component> getNewComponents(User user) throws Exception {
         ArrayList<Component> Cs = new ArrayList<>();
 
         Font font = null;
@@ -165,7 +166,52 @@ public class ComponentBuilder {
 
         //-------- THIRD ROW
 
-            //TODO: ADD CITY & ROOM OPTIONS
+        UIManager.setLookAndFeel(Main.defaultLAF);
+        JComboBox<String> cityBox = new JComboBox<>();
+        cityBox.setSize(250, 40);
+        cityBox.setLocation(150,300);
+        cityBox.setUI(new CustomCBUI());
+        cityBox.setForeground(Color.WHITE);
+        cityBox.setBackground(new Color(48,48,67));
+        cityBox.setFont(font.deriveFont(24f));
+        for (String s : HTTPRequest.getInstance().getCities(user)) {
+            cityBox.addItem(s);
+        }
+        Cs.add(cityBox);
+
+        JComboBox<String> roomBox = new JComboBox<>();
+        roomBox.setSize(250, 40);
+        roomBox.setLocation(530,300);
+        roomBox.setUI(new CustomCBUI());
+        roomBox.setForeground(Color.WHITE);
+        roomBox.setBackground(new Color(48,48,67));
+        roomBox.setFont(font.deriveFont(24f));
+        cityBox.addActionListener(e -> {
+            try {
+                roomBox.removeAllItems();
+                for (String s : HTTPRequest.getInstance().getRooms(user, (String) cityBox.getSelectedItem())) {
+                    roomBox.addItem(s);
+                }
+            } catch (Exception ex) {ex.printStackTrace();}
+        });
+        Cs.add(roomBox);
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+        //-------- FOURTH ROW
+
+        UIManager.setLookAndFeel(Main.defaultLAF);
+        JComboBox<String> positionBox = new JComboBox<>();
+        positionBox.setSize(250, 40);
+        positionBox.setLocation(150,400);
+        positionBox.setUI(new CustomCBUI());
+        positionBox.setForeground(Color.WHITE);
+        positionBox.setBackground(new Color(48,48,67));
+        positionBox.setFont(font.deriveFont(24f));
+        for (String s : HTTPRequest.getInstance().getPositions(user)) {
+            positionBox.addItem(s);
+        }
+        Cs.add(positionBox);
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         //-------- END
 

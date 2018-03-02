@@ -1,6 +1,7 @@
 package sk.miscik.gui;
 
 import sk.miscik.main.ComponentBuilder;
+import sk.miscik.main.HTTPRequest;
 import sk.miscik.main.Main;
 import sk.miscik.main.User;
 
@@ -22,6 +23,9 @@ public class ManagementGUI extends JFrame {
 
     public ManagementGUI(User user) throws Exception {
         super("ProjektHR Managment");
+
+        HTTPRequest.getInstance().getCities(user);
+
         Font font = Font.createFont(Font.TRUETYPE_FONT, Main.class.getResourceAsStream("segoeuil.ttf"));
 
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

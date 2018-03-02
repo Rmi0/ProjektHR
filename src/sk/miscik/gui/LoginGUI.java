@@ -2,7 +2,7 @@ package sk.miscik.gui;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import sk.miscik.main.HTMLRequest;
+import sk.miscik.main.HTTPRequest;
 import sk.miscik.main.Main;
 import sk.miscik.main.User;
 
@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 
 /**
  * Created by client on 09.02.2018.
@@ -88,7 +87,7 @@ public class LoginGUI extends JFrame {
             char[] pass = this.passField.getPassword();
             String message = "{\"userName\": \""+userName+"\", \"password\": \""+String.valueOf(pass)+"\"}";
             try {
-                String response = HTMLRequest.getInstance().getAuth("http://194.160.229.181:8081/api/auth/login", message);
+                String response = HTTPRequest.getInstance().getAuth("http://localhost:8081/api/auth/login", message);
                 if (response.startsWith("ERROR_")) {
                     int errCode = Integer.parseInt(response.split("_")[1]);
                     if (errCode == 401) {
@@ -104,7 +103,7 @@ public class LoginGUI extends JFrame {
                     String firstName = (String) userTree.get("firstName");
                     String lastName = (String) userTree.get("lastName");
                     String email = (String) userTree.get("email");
-                    String avatarURL = ((String) userTree.get("photoUrl")).replace("localhost","194.160.229.181");
+                    String avatarURL = ((String) userTree.get("photoUrl"));
                     String token = (String) tree.get("token");
                     User user = new User(firstName,lastName, token, email,avatarURL);
                     this.dispose();
