@@ -186,6 +186,9 @@ public class ComponentBuilder {
         roomBox.setForeground(Color.WHITE);
         roomBox.setBackground(new Color(48,48,67));
         roomBox.setFont(font.deriveFont(24f));
+        for (String s : HTTPRequest.getInstance().getRooms(user, (String) cityBox.getSelectedItem())) {
+            roomBox.addItem(s);
+        }
         cityBox.addActionListener(e -> {
             try {
                 roomBox.removeAllItems();
@@ -235,15 +238,86 @@ public class ComponentBuilder {
         });
         submitButton.setFont(font.deriveFont(30f));
         submitButton.addActionListener(e -> {
-            firstNameField.setText("");
-            lastNameField.setText("");
-            emailField.setText("");
-            phoneField.setText("");
-            JOptionPane.showMessageDialog(null, "Operation completed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            //TODO: Submit application form
+            try {
+                Applicant applicant = new Applicant(firstNameField.getText(), lastNameField.getText(), emailField.getText(),
+                        phoneField.getText(), (String) cityBox.getSelectedItem(), (String) roomBox.getSelectedItem(),
+                        (String) positionBox.getSelectedItem());
+                HTTPRequest.getInstance().submitInterview(user, applicant);
+                //JOptionPane.showMessageDialog(null, "Operation completed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                firstNameField.setText("");
+                lastNameField.setText("");
+                emailField.setText("");
+                phoneField.setText("");
+            } catch (Exception ex) {ex.printStackTrace();}
         });
         Cs.add(submitButton);
 
         return Cs;
     }
+
+    public static ArrayList<Component> getViewComponents(User user) {
+        ArrayList<Component> Cs = new ArrayList<>();
+
+        Font font = null;
+        try {
+            font = Font.createFont(Font.TRUETYPE_FONT, Main.class.getResourceAsStream("segoeuil.ttf"));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        JLabel row1 = new JLabel("");
+        row1.setSize(780,60);
+        row1.setLocation(140,50);
+        row1.setFont(font.deriveFont(36f));
+        row1.setForeground(Color.WHITE);
+        Cs.add(row1);
+
+        JLabel row2 = new JLabel("");
+        row2.setSize(780,60);
+        row2.setLocation(140,120);
+        row2.setFont(font.deriveFont(36f));
+        row2.setForeground(Color.WHITE);
+        Cs.add(row2);
+
+        JLabel row3 = new JLabel("");
+        row3.setSize(780,60);
+        row3.setLocation(140,190);
+        row3.setFont(font.deriveFont(36f));
+        row3.setForeground(Color.WHITE);
+        Cs.add(row3);
+
+        JLabel row4 = new JLabel("");
+        row4.setSize(780,60);
+        row4.setLocation(140,260);
+        row4.setFont(font.deriveFont(36f));
+        row4.setForeground(Color.WHITE);
+        Cs.add(row4);
+
+        JLabel row5 = new JLabel("");
+        row5.setSize(780,60);
+        row5.setLocation(140,330);
+        row5.setFont(font.deriveFont(36f));
+        row5.setForeground(Color.WHITE);
+        Cs.add(row5);
+
+        row1.setText("Test Test");
+        row2.setText("Test Test");
+        row3.setText("Test Test");
+        row4.setText("Test Test");
+        row5.setText("Test Test");
+
+        JButton prev = new JButton("<< Prev");
+        prev.setSize(100,25);
+        prev.setLocation(140, 400);
+        Cs.add(prev);
+
+        JButton next = new JButton("Next >>");
+        next.setSize(100,25);
+        next.setLocation(690, 400);
+        Cs.add(next);
+
+        return Cs;
+    }
+
 }

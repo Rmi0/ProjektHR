@@ -19,6 +19,7 @@ public class ManagementGUI extends JFrame {
     private User user;
     private ArrayList<Component> dashboardComponents;
     private ArrayList<Component> newComponents;
+    private ArrayList<Component> viewComponents;
     private Point mouse;
 
     public ManagementGUI(User user) throws Exception {
@@ -43,6 +44,7 @@ public class ManagementGUI extends JFrame {
 
         this.dashboardComponents = ComponentBuilder.getDashboardComponents(user);
         this.newComponents = ComponentBuilder.getNewComponents(user);
+        this.viewComponents = ComponentBuilder.getViewComponents(user);
 
         for (Component c : dashboardComponents) {
             this.add(c);
@@ -111,6 +113,7 @@ public class ManagementGUI extends JFrame {
         sidePanel.setSize(130,HEIGHT-40);
         sidePanel.setLocation(0,40);
         sidePanel.setBackground(new Color(48,48,67));
+        sidePanel.setLayout(null);
 
         JButton dashboardButton = new JButton("Dashboard");
         dashboardButton.setSize(130,40);
@@ -135,6 +138,9 @@ public class ManagementGUI extends JFrame {
         });
         dashboardButton.addActionListener(e ->{
             for (Component c : newComponents) {
+                this.getContentPane().remove(c);
+            }
+            for (Component c : viewComponents) {
                 this.getContentPane().remove(c);
             }
             for (Component c : dashboardComponents) {
@@ -170,6 +176,9 @@ public class ManagementGUI extends JFrame {
             for (Component c : dashboardComponents) {
                 this.getContentPane().remove(c);
             }
+            for (Component c : viewComponents) {
+                this.getContentPane().remove(c);
+            }
             for (Component c : newComponents) {
                 this.getContentPane().add(c);
             }
@@ -177,6 +186,42 @@ public class ManagementGUI extends JFrame {
             this.getContentPane().repaint();
         });
         sidePanel.add(newButton);
+
+        JButton viewButton = new JButton("View");
+        viewButton.setSize(130,40);
+        viewButton.setLocation(0, 80);
+        viewButton.setFocusPainted(false);
+        viewButton.setBorderPainted(false);
+        viewButton.setContentAreaFilled(false);
+        viewButton.setForeground(Color.WHITE);
+        viewButton.setMargin(new Insets(0,0,0,0));
+        viewButton.setBorder(null);
+        viewButton.setFont(font.deriveFont(24f));
+        viewButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                viewButton.setForeground(Color.CYAN);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                viewButton.setForeground(Color.WHITE);
+            }
+        });
+        viewButton.addActionListener(e ->{
+            for (Component c : dashboardComponents) {
+                this.getContentPane().remove(c);
+            }
+            for (Component c : newComponents) {
+                this.getContentPane().remove(c);
+            }
+            for (Component c : viewComponents) {
+                this.getContentPane().add(c);
+            }
+            this.getContentPane().revalidate();
+            this.getContentPane().repaint();
+        });
+        sidePanel.add(viewButton);
 
         this.getContentPane().add(sidePanel);
 

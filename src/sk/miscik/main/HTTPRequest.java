@@ -1,6 +1,7 @@
 package sk.miscik.main;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
@@ -10,7 +11,9 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -199,13 +202,32 @@ public class HTTPRequest {
         }
 
         con.setRequestMethod("POST");
+        con.setDoOutput(true);
+        con.setRequestProperty("Accept", "application/json");
+        con.setRequestProperty("Content-Type", "application/json");
 
-        String data = "{" +
-                            "\"candidate\":{" +
-                                "" +
-                            "}" +
-                            "{}" +
-                      "}";
+
+        JSONObject tree = new JSONObject();
+
+        JSONObject candidade = new JSONObject();
+        candidade.put("firstName",applicant.getFirstName());
+        candidade.put("lastName",applicant.getLastName());
+        candidade.put("phone",applicant.getPhone());
+        candidade.put("email", applicant.getEmail());
+        candidade.put("position",applicant.getPosition());
+        tree.put("candidate", candidade);
+
+        JSONObject interview = new JSONObject();
+        interview.put("location", applicant.getCity());
+        interview.put("room", applicant.getRoom());
+        Date date = new Date();
+        SimpleDateFormat sdfD = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm");
+        interview.put("dateTime", sdfD.format(date)+"T"+sdfT.format(date));
+        tree.put("interview", interview);
+
+        String data = tree.toJSONString();
+        System.out.println(data);
 
         OutputStream os = con.getOutputStream();
         OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
@@ -217,7 +239,7 @@ public class HTTPRequest {
         con.connect();
 
         int responseCode = con.getResponseCode();
-        if (responseCode != 200) {
+        if (responseCode != 201) {
             System.err.println("ERROR: code "+responseCode);
             return;
         }
