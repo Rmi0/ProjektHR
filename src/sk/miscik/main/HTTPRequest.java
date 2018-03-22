@@ -4,13 +4,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class HTTPRequest {
 
+    public static final String IP_ADDRESS = "localhost:8081";
     private static HTTPRequest instance;
 
     private HTTPRequest() {}
@@ -31,9 +32,8 @@ public class HTTPRequest {
         return instance;
     }
 
-    public String getAuth(String url, String data) throws Exception {
-        if (url == null) throw new NullPointerException("url=null");
-        URL obj = new URL(url);
+    public String getAuth(String data) throws Exception {
+        URL obj = new URL("http://"+HTTPRequest.IP_ADDRESS+"/api/auth/login");
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
         if (con == null) {
@@ -69,11 +69,11 @@ public class HTTPRequest {
         }
         in.close();
 
-        return response.toString();
+        return response.toString().replaceAll("localhost:[0-9]+",HTTPRequest.IP_ADDRESS);
     }
 
     public List<String> getCities(User user) throws Exception {
-        String url = "http://localhost:8081/api/locations";
+        String url = "http://"+HTTPRequest.IP_ADDRESS+"/api/locations";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.addRequestProperty("Authorization","Bearer "+user.getToken());
@@ -112,7 +112,7 @@ public class HTTPRequest {
     }
 
     public List<String> getRooms(User user, String city) throws Exception {
-        String url = "http://localhost:8081/api/locations/"+city+"/rooms";
+        String url = "http://"+HTTPRequest.IP_ADDRESS+"/api/locations/"+city+"/rooms";
         url = url.replaceAll(" ", "%20");
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -152,7 +152,7 @@ public class HTTPRequest {
     }
 
     public List<String> getPositions(User user) throws Exception {
-        String url = "http://localhost:8081/api/positions";
+        String url = "http://"+HTTPRequest.IP_ADDRESS+"/api/positions";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.addRequestProperty("Authorization","Bearer "+user.getToken());
@@ -191,7 +191,7 @@ public class HTTPRequest {
     }
 
     public void submitInterview(User user, Applicant applicant) throws Exception {
-        String url = "http://localhost:8081/api/interviews";
+        String url = "http://"+HTTPRequest.IP_ADDRESS+"/api/interviews";
         if (user == null) throw new NullPointerException("user=null");
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -241,7 +241,32 @@ public class HTTPRequest {
         int responseCode = con.getResponseCode();
         if (responseCode != 201) {
             System.err.println("ERROR: code "+responseCode);
+            JOptionPane.showMessageDialog(null,"Failed to submit interview!","Error",JOptionPane.ERROR_MESSAGE);
             return;
+        } else {
+            JOptionPane.showMessageDialog(null,"Interview added successfully!","Success",JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public Applicant[] getInterviews(User user, int start, int limit) throws Exception {
+        String url = "http://"+HTTPRequest.IP_ADDRESS+"/api/interviews";
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.addRequestProperty("Authorization","Bearer "+user.getToken());
+
+        if (con == null) {
+            throw new NullPointerException("exception: conn = null");
+        }
+
+        con.setRequestMethod("GET");
+        con.setDoOutput(true);
+        con.setRequestProperty("Accept", "application/json");
+
+        con.connect();
+
+        int responseCode = con.getResponseCode();
+        if (responseCode != 200) {
+            System.err.println("ERROR: code "+responseCode);
         }
 
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -252,10 +277,41 @@ public class HTTPRequest {
             response.append(inputLine);
         }
         in.close();
-    }
 
+        Applicant[] applicants = new Applicant[limit];
+        for (int i = 0; i < limit; i++) {
+            applicants[i] = null;
+        }
+
+        JSONArray array = (JSONArray) new JSONParser().parse(response.toString());
+        if (start >= array.size()) return null;
+        if (start < 0) return null;
+        int end = start+limit>=array.size()?array.size():start+limit;
+        List list = array.subList(start, end);
+        int i = 0;
+        for (Object obj1 : list) {
+            JSONObject o = (JSONObject) obj1;
+            JSONObject candidate = (JSONObject) o.get("candidate");
+            String firstName = (String) candidate.get("firstName");
+            String lastName = (String) candidate.get("lastName");
+            String phone = String.valueOf(candidate.get("phone"));
+            String email = (String) candidate.get("email");
+            String position = (String) candidate.get("position");
+
+            JSONObject interview = (JSONObject) o.get("interview");
+            String city = (String) interview.get("location");
+            String room = (String) interview.get("room");
+
+            applicants[i] = new Applicant(firstName,lastName,email,phone,city,room,position);
+
+            i++;
+        }
+
+        return applicants;
+    }
+    
     public void logout(User user) throws Exception {
-        String url = "http://localhost:8081/api/auth/logout";
+        String url = "http://"+HTTPRequest.IP_ADDRESS+"/api/auth/logout";
         if (user == null) throw new NullPointerException("user=null");
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();

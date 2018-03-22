@@ -1,7 +1,6 @@
 package sk.miscik.gui;
 
 import javax.swing.*;
-import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import java.awt.*;

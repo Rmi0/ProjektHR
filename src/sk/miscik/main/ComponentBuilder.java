@@ -15,6 +15,8 @@ import java.util.ArrayList;
  */
 public class ComponentBuilder {
 
+    private static int viewPage = 0;
+
     public static ArrayList<Component> getDashboardComponents(User user) {
         ArrayList<Component> Cs = new ArrayList<>();
 
@@ -257,6 +259,7 @@ public class ComponentBuilder {
     }
 
     public static ArrayList<Component> getViewComponents(User user) {
+        viewPage = 0;
         ArrayList<Component> Cs = new ArrayList<>();
 
         Font font = null;
@@ -265,57 +268,115 @@ public class ComponentBuilder {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         JLabel row1 = new JLabel("");
         row1.setSize(780,60);
         row1.setLocation(140,50);
-        row1.setFont(font.deriveFont(36f));
+        row1.setFont(font.deriveFont(14f));
         row1.setForeground(Color.WHITE);
         Cs.add(row1);
 
         JLabel row2 = new JLabel("");
         row2.setSize(780,60);
         row2.setLocation(140,120);
-        row2.setFont(font.deriveFont(36f));
+        row2.setFont(font.deriveFont(14f));
         row2.setForeground(Color.WHITE);
         Cs.add(row2);
 
         JLabel row3 = new JLabel("");
         row3.setSize(780,60);
         row3.setLocation(140,190);
-        row3.setFont(font.deriveFont(36f));
+        row3.setFont(font.deriveFont(14f));
         row3.setForeground(Color.WHITE);
         Cs.add(row3);
 
         JLabel row4 = new JLabel("");
         row4.setSize(780,60);
         row4.setLocation(140,260);
-        row4.setFont(font.deriveFont(36f));
+        row4.setFont(font.deriveFont(14f));
         row4.setForeground(Color.WHITE);
         Cs.add(row4);
 
         JLabel row5 = new JLabel("");
         row5.setSize(780,60);
         row5.setLocation(140,330);
-        row5.setFont(font.deriveFont(36f));
+        row5.setFont(font.deriveFont(14f));
         row5.setForeground(Color.WHITE);
         Cs.add(row5);
 
-        row1.setText("Test Test");
-        row2.setText("Test Test");
-        row3.setText("Test Test");
-        row4.setText("Test Test");
-        row5.setText("Test Test");
+        row1.setText("Failed to fetch data!");
+        row2.setText("Failed to fetch data!");
+        row3.setText("Failed to fetch data!");
+        row4.setText("Failed to fetch data!");
+        row5.setText("Failed to fetch data!");
+
+        JLabel page = new JLabel("ERROR");
+        page.setSize(100,25);
+        page.setLocation(435,410);
+        page.setFont(font.deriveFont(12f));
+        page.setForeground(Color.WHITE);
+        Cs.add(page);
 
         JButton prev = new JButton("<< Prev");
         prev.setSize(100,25);
-        prev.setLocation(140, 400);
+        prev.setLocation(140, 410);
+        prev.addActionListener(e -> {
+            try {
+                viewPage--;
+                Applicant[] applicants = HTTPRequest.getInstance().getInterviews(user, viewPage*5, 5);
+                if (applicants == null) {
+                    viewPage++;
+                    return;
+                }
+                String format = "!f !l | !e | !p | !c | !r";
+                if (applicants[0] != null) row1.setText(applicants[0].format(format)); else row1.setText("");
+                if (applicants[1] != null) row2.setText(applicants[1].format(format)); else row2.setText("");
+                if (applicants[2] != null) row3.setText(applicants[2].format(format)); else row3.setText("");
+                if (applicants[3] != null) row4.setText(applicants[3].format(format)); else row4.setText("");
+                if (applicants[4] != null) row5.setText(applicants[4].format(format)); else row5.setText("");
+                page.setText("PAGE "+(viewPage+1));
+            } catch (Exception ex) {ex.printStackTrace();}
+        });
         Cs.add(prev);
 
         JButton next = new JButton("Next >>");
         next.setSize(100,25);
-        next.setLocation(690, 400);
+        next.setLocation(690, 410);
+        next.addActionListener(e -> {
+            try {
+                viewPage++;
+                Applicant[] applicants = HTTPRequest.getInstance().getInterviews(user, viewPage*5, 5);
+                if (applicants == null) {
+                    viewPage--;
+                    return;
+                }
+                String format = "!f !l | !e | !p | !c | !r";
+                if (applicants[0] != null) row1.setText(applicants[0].format(format)); else row1.setText("");
+                if (applicants[1] != null) row2.setText(applicants[1].format(format)); else row2.setText("");
+                if (applicants[2] != null) row3.setText(applicants[2].format(format)); else row3.setText("");
+                if (applicants[3] != null) row4.setText(applicants[3].format(format)); else row4.setText("");
+                if (applicants[4] != null) row5.setText(applicants[4].format(format)); else row5.setText("");
+                page.setText("PAGE "+(viewPage+1));
+            } catch (Exception ex) {ex.printStackTrace();}
+        });
         Cs.add(next);
+
+        try {
+            Applicant[] applicants = HTTPRequest.getInstance().getInterviews(user, viewPage*5, 5);
+            if (applicants != null) {
+                String format = "!f !l | !e | !p | !c | !r";
+                if (applicants[0] != null) row1.setText(applicants[0].format(format));
+                else row1.setText("");
+                if (applicants[1] != null) row2.setText(applicants[1].format(format));
+                else row2.setText("");
+                if (applicants[2] != null) row3.setText(applicants[2].format(format));
+                else row3.setText("");
+                if (applicants[3] != null) row4.setText(applicants[3].format(format));
+                else row4.setText("");
+                if (applicants[4] != null) row5.setText(applicants[4].format(format));
+                else row5.setText("");
+            }
+            page.setText("PAGE "+(viewPage+1));
+        } catch (Exception ex) {ex.printStackTrace();}
 
         return Cs;
     }

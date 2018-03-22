@@ -216,6 +216,10 @@ public class ManagementGUI extends JFrame {
                 this.getContentPane().remove(c);
             }
             for (Component c : viewComponents) {
+                this.getContentPane().remove(c);
+            }
+            this.viewComponents = ComponentBuilder.getViewComponents(user);
+            for (Component c : viewComponents) {
                 this.getContentPane().add(c);
             }
             this.getContentPane().revalidate();

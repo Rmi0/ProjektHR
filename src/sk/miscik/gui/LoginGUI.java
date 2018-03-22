@@ -87,7 +87,7 @@ public class LoginGUI extends JFrame {
             char[] pass = this.passField.getPassword();
             String message = "{\"userName\": \""+userName+"\", \"password\": \""+String.valueOf(pass)+"\"}";
             try {
-                String response = HTTPRequest.getInstance().getAuth("http://localhost:8081/api/auth/login", message);
+                String response = HTTPRequest.getInstance().getAuth(message);
                 if (response.startsWith("ERROR_")) {
                     int errCode = Integer.parseInt(response.split("_")[1]);
                     if (errCode == 401) {

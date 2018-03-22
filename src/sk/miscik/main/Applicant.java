@@ -72,4 +72,15 @@ public class Applicant {
     public void setPosition(String position) {
         this.position = position;
     }
+
+    public String format(String format) {
+        format = format.replaceAll("!f", this.firstName);
+        format = format.replaceAll("!l", this.lastName);
+        format = format.replaceAll("!e",this.email);
+        format = format.replaceAll("!n",this.phone);
+        format = format.replaceAll("!c",this.city);
+        format = format.replaceAll("!r",this.room);
+        format = format.replaceAll("!p",this.position);
+        return format;
+    }
 }
