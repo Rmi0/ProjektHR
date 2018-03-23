@@ -1,14 +1,19 @@
 package sk.miscik.main;
 
+import datechooser.beans.DateChooserDialog;
 import sk.miscik.gui.CustomCBUI;
 import sk.miscik.gui.LoginGUI;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by client on 23.02.2018.
@@ -16,6 +21,7 @@ import java.util.ArrayList;
 public class ComponentBuilder {
 
     private static int viewPage = 0;
+    private static Date date = null;
 
     public static ArrayList<Component> getDashboardComponents(User user) {
         ArrayList<Component> Cs = new ArrayList<>();
@@ -218,6 +224,41 @@ public class ComponentBuilder {
         Cs.add(positionBox);
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
+        JButton dateButton = new JButton("Choose date");
+        dateButton.setSize(250,40);
+        dateButton.setLocation(530,400);
+        dateButton.setFocusPainted(false);
+        dateButton.setBorderPainted(false);
+        dateButton.setContentAreaFilled(false);
+        dateButton.setForeground(Color.WHITE);
+        dateButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                dateButton.setForeground(Color.CYAN);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                dateButton.setForeground(Color.WHITE);
+            }
+        });
+        dateButton.setFont(font.deriveFont(30f));
+        dateButton.addActionListener(e -> {
+            DateChooserDialog dialog = new DateChooserDialog();
+            if (date != null) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                dialog.setSelectedDate(cal);
+            }
+            dialog.showDialog(null);
+            date = dialog.getSelectedDate().getTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            dateButton.setText(sdf.format(date));
+        });
+
+        Cs.add(dateButton);
+
+
         //-------- END
 
         JButton submitButton = new JButton("Submit");
@@ -241,16 +282,35 @@ public class ComponentBuilder {
         submitButton.setFont(font.deriveFont(30f));
         submitButton.addActionListener(e -> {
             try {
-                Applicant applicant = new Applicant(firstNameField.getText(), lastNameField.getText(), emailField.getText(),
-                        phoneField.getText(), (String) cityBox.getSelectedItem(), (String) roomBox.getSelectedItem(),
-                        (String) positionBox.getSelectedItem());
-                HTTPRequest.getInstance().submitInterview(user, applicant);
-                //JOptionPane.showMessageDialog(null, "Operation completed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                //CHECK IF DATE IS NULL
+                if (date == null) {
+                    JOptionPane.showMessageDialog(null, "Date was not set!", "Error", JOptionPane.ERROR_MESSAGE);
+                //CHECK IF DATE IS AFTER TODAY
+                } else if (date.getTime() < new Date().getTime()) {
+                    JOptionPane.showMessageDialog(null, "Date is before today!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(date);
+                    int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+                    //CHECK IF DATE IS SATURDAY/SUNDAY
+                    if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+                        JOptionPane.showMessageDialog(null, "The chosen date is Saturday/Sunday!", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        SimpleDateFormat sdfD = new SimpleDateFormat("yyyy-MM-dd");
+                        SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm");
+                        Applicant applicant = new Applicant(firstNameField.getText(), lastNameField.getText(), emailField.getText(),
+                                phoneField.getText(), (String) cityBox.getSelectedItem(), (String) roomBox.getSelectedItem(),
+                                (String) positionBox.getSelectedItem(), sdfD.format(date)+"T"+sdfT.format(date));
+                        HTTPRequest.getInstance().submitInterview(user, applicant);
 
-                firstNameField.setText("");
-                lastNameField.setText("");
-                emailField.setText("");
-                phoneField.setText("");
+                        firstNameField.setText("");
+                        lastNameField.setText("");
+                        emailField.setText("");
+                        phoneField.setText("");
+                        dateButton.setText("Choose date");
+                        date = null;
+                    }
+                }
             } catch (Exception ex) {ex.printStackTrace();}
         });
         Cs.add(submitButton);

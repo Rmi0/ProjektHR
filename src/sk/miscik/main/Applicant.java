@@ -1,13 +1,16 @@
 package sk.miscik.main;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by client on 02.03.2018.
  */
 public class Applicant {
 
-    private String firstName, lastName, email, phone, city, room, position;
+    private String firstName, lastName, email, phone, city, room, position, date;
 
-    public Applicant(String firstName, String lastName, String email, String phone, String city, String room, String position) {
+    public Applicant(String firstName, String lastName, String email, String phone, String city, String room, String position, String date) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -15,6 +18,7 @@ public class Applicant {
         this.city = city;
         this.room = room;
         this.position = position;
+        this.date = date;
     }
 
     public String getFirstName() {
@@ -73,6 +77,14 @@ public class Applicant {
         this.position = position;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public String format(String format) {
         format = format.replaceAll("!f", this.firstName);
         format = format.replaceAll("!l", this.lastName);
@@ -81,6 +93,7 @@ public class Applicant {
         format = format.replaceAll("!c",this.city);
         format = format.replaceAll("!r",this.room);
         format = format.replaceAll("!p",this.position);
+        format = format.replaceAll("!d",this.date);
         return format;
     }
 }

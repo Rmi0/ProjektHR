@@ -220,10 +220,7 @@ public class HTTPRequest {
         JSONObject interview = new JSONObject();
         interview.put("location", applicant.getCity());
         interview.put("room", applicant.getRoom());
-        Date date = new Date();
-        SimpleDateFormat sdfD = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm");
-        interview.put("dateTime", sdfD.format(date)+"T"+sdfT.format(date));
+        interview.put("dateTime", applicant.getDate());
         tree.put("interview", interview);
 
         String data = tree.toJSONString();
@@ -301,8 +298,9 @@ public class HTTPRequest {
             JSONObject interview = (JSONObject) o.get("interview");
             String city = (String) interview.get("location");
             String room = (String) interview.get("room");
+            String date = (String) interview.get("dateTime");
 
-            applicants[i] = new Applicant(firstName,lastName,email,phone,city,room,position);
+            applicants[i] = new Applicant(firstName,lastName,email,phone,city,room,position,date);
 
             i++;
         }
