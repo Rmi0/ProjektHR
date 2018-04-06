@@ -25,7 +25,8 @@ public class ManagementGUI extends JFrame {
     public ManagementGUI(User user) throws Exception {
         super("ProjektHR Managment");
 
-        HTTPRequest.getInstance().getCities(user);
+        ComponentBuilder.init(this);
+        //HTTPRequest.getInstance().getCities(user);
 
         Font font = Font.createFont(Font.TRUETYPE_FONT, Main.class.getResourceAsStream("segoeuil.ttf"));
 

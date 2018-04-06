@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class HTTPRequest {
 
-    public static final String IP_ADDRESS = "localhost:8081";
+    public static final String IP_ADDRESS = "194.160.229.181:8081";
     private static HTTPRequest instance;
 
     private HTTPRequest() {}
@@ -306,6 +306,10 @@ public class HTTPRequest {
         }
 
         return applicants;
+    }
+
+    public void deleteCandidate(User user, Applicant applicant) {
+        //TODO: DELETE CANDIDATE
     }
     
     public void logout(User user) throws Exception {

@@ -1,8 +1,5 @@
 package sk.miscik.main;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Created by client on 02.03.2018.
  */
